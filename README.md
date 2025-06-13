@@ -25,3 +25,9 @@ Python-React-Demo/
 ├── frontend-react-nextjs/     # React Next.js frontend (Coming up next)
 └── README.md                  # This file
 ```
+
+## 📊 Demo Screenshot
+
+![Stocks Dashboard](stocks-dashboard-screenshot.png)
+
+_Stocks daily returns visualization dashboard_
