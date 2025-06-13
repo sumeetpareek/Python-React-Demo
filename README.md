@@ -14,9 +14,8 @@ This project demonstrates real-world use of:
 
 ## 🚀 Quick Start - Local Dev
 
-To get started with this project on your local dev machine:
-
-- **Backend Setup** - [Follow these instructions for setting up and running the Python FastAPI backend](backend-python-fastapi/README.md)
+- **[Backend Setup](backend-python-fastapi/README.md)** - Instructions for setting up and running the Python FastAPI backend
+- **[Frontend Setup](frontend-react-nextjs/README.md)** - Instructions for setting up and running the React Next.js frontend
 
 ## 📁 Project Structure
 

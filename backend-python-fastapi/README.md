@@ -1,6 +1,6 @@
 # Python FastAPI Backend
 
-A simple FastAPI backend server for the Python-React Demo project.
+A simple FastAPI backend server for the Python-React-Demo project.
 
 ## Setup Instructions
 

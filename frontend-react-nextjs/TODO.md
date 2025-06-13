@@ -1,1 +1,0 @@
-Frontend React Next.js setup goes here.
