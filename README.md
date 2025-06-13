@@ -1,6 +1,6 @@
-# FastAPI-Python-React-Demo
+# Python-React-Demo
 
-This is a working demo application for visualizing daily returns of MAG7 stocks with a FastAPI Python backend and Next.js React frontend.
+This is a working demo application for visualizing daily returns of MAG7 stocks with a Python backend and React frontend.
 
 ## 🙏 Purpose
 
