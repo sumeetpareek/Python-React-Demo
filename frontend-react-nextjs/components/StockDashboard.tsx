@@ -48,12 +48,8 @@ export function StockDashboard() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            MAG7 Stocks Dashboard
+            {process.env.NEXT_PUBLIC_APP_TITLE}
           </h1>
-          <p className="text-lg text-gray-600">
-            Visualize daily returns for Microsoft, Apple, Google, Amazon,
-            NVIDIA, Meta, and Tesla
-          </p>
         </div>
 
         {/* Controls */}

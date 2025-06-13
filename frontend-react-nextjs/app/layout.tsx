@@ -13,10 +13,18 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MAG7 Stocks Dashboard",
+  title: process.env.NEXT_PUBLIC_APP_TITLE || "Stocks Dashboard",
   description:
+    process.env.NEXT_PUBLIC_APP_DESCRIPTION ||
     "Interactive dashboard for visualizing daily returns of MAG7 stocks (MSFT, AAPL, GOOGL, AMZN, NVDA, META, TSLA)",
-  keywords: ["stocks", "dashboard", "MAG7", "finance", "charts", "returns"],
+  keywords: process.env.NEXT_PUBLIC_APP_KEYWORDS?.split(",") || [
+    "stocks",
+    "dashboard",
+    "MAG7",
+    "finance",
+    "charts",
+    "returns",
+  ],
   authors: [{ name: "MAG7 Dashboard" }],
   viewport: "width=device-width, initial-scale=1",
 };

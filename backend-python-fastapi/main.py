@@ -3,23 +3,24 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 
-# Import our custom API endpoints
+# Import our custom API endpoints and configuration
 from api_endpoints import router as stock_router
+from config import config
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=getattr(logging, config.LOG_LEVEL))
 logger = logging.getLogger(__name__)
 
 app = FastAPI(
-    title="MAG7 Stock Returns API",
-    description="API for fetching daily returns of MAG7 stocks (MSFT, AAPL, GOOGL, AMZN, NVDA, META, TSLA)",
-    version="1.0.0"
+    title=config.API_TITLE,
+    description=config.API_DESCRIPTION,
+    version=config.API_VERSION
 )
 
 # Enable CORS for the React frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # React dev server
+    allow_origins=config.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -28,14 +29,11 @@ app.add_middleware(
 # Include the stock returns API router
 app.include_router(stock_router)
 
-# This is the configurable message that will be returned by the API
-INFO_MESSAGE = "Hello from Monorepo FastAPI backend! v2"
-
 @app.get("/")
 async def read_root():
     return {
-        "message": "Welcome to the MAG7 Stock Returns API!",
-        "version": "1.0.0",
+        "message": f"Welcome to the {config.API_TITLE}",
+        "version": config.API_VERSION,
         "endpoints": {
             "stock_returns": "/api/returns?start=YYYY-MM-DD&end=YYYY-MM-DD",
             "health_check": "/api/health",
@@ -45,9 +43,9 @@ async def read_root():
 
 @app.get("/api/info")
 async def get_info():
-    return {"message": INFO_MESSAGE}
+    return {"message": config.INFO_MESSAGE}
 
 if __name__ == "__main__":
     import uvicorn
     logger.info("Starting MAG7 Stock Returns API server...")
-    uvicorn.run(app, host="0.0.0.0", port=8000) 
+    uvicorn.run(app, host=config.HOST, port=config.PORT) 

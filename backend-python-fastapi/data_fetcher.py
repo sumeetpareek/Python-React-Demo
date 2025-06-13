@@ -4,18 +4,18 @@ import pandas as pd
 from datetime import datetime, date
 import logging
 
+# Import configuration
+from config import config
+
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=getattr(logging, config.LOG_LEVEL))
 logger = logging.getLogger(__name__)
 
 class StockDataFetcher:
     """Handles fetching stock data from yfinance"""
     
-    # MAG7 stocks as specified in requirements
-    MAG7_SYMBOLS = ["MSFT", "AAPL", "GOOGL", "AMZN", "NVDA", "META", "TSLA"]
-    
     def __init__(self):
-        self.symbols = self.MAG7_SYMBOLS
+        self.symbols = config.MAG7_SYMBOLS
     
     def fetch_daily_prices(
         self, 
@@ -95,6 +95,6 @@ class StockDataFetcher:
         if start_date > date.today():
             raise ValueError("Start date cannot be in the future")
         
-        # Check if date range is reasonable (not more than 10 years)
-        if (end_date - start_date).days > 3650:
-            raise ValueError("Date range cannot exceed 10 years") 
+        # Check if date range is reasonable (not more than configured max days)
+        if (end_date - start_date).days > config.MAX_DATE_RANGE_DAYS:
+            raise ValueError(f"Date range cannot exceed {config.MAX_DATE_RANGE_DAYS} days") 

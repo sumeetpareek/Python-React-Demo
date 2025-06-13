@@ -1,4 +1,4 @@
-# MAG7 Stocks Dashboard
+# Stocks Dashboard
 
 A beautiful, responsive Next.js dashboard for visualizing daily returns of MAG7 stocks (MSFT, AAPL, GOOGL, AMZN, NVDA, META, TSLA) using interactive charts.
 
