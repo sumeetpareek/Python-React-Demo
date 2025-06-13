@@ -90,7 +90,7 @@ export function StockChart({ summary }: StockChartProps) {
           color: "#6b7280",
           font: {
             size: 12,
-            weight: "bold",
+            weight: "bold" as const,
           },
         },
         grid: {
@@ -112,7 +112,7 @@ export function StockChart({ summary }: StockChartProps) {
           color: "#6b7280",
           font: {
             size: 12,
-            weight: "bold",
+            weight: "bold" as const,
           },
         },
         grid: {
@@ -124,7 +124,11 @@ export function StockChart({ summary }: StockChartProps) {
           font: {
             size: 11,
           },
-          callback: (value: number) => `${value.toFixed(1)}%`,
+          callback: function (tickValue: string | number) {
+            const value =
+              typeof tickValue === "number" ? tickValue : parseFloat(tickValue);
+            return `${value.toFixed(1)}%`;
+          },
         },
       },
     },
