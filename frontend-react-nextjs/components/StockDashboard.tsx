@@ -122,7 +122,7 @@ export function StockDashboard() {
               </div>
 
               {/* Stock Cards Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6">
                 {summaries.map((summary) => (
                   <StockCard key={summary.ticker} summary={summary} />
                 ))}

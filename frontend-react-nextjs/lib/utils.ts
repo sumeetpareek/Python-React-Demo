@@ -1,3 +1,4 @@
+
 import { StockDataPoint, StockSummary } from './types';
 
 export function calculateSummaryStats(data: StockDataPoint[]): Omit<StockSummary, 'ticker' | 'data'> {
@@ -46,4 +47,16 @@ export function getStockColor(ticker: string): string {
 
 export function cn(...classes: (string | undefined | null | false)[]): string {
   return classes.filter(Boolean).join(' ');
+}
+
+export function calculateCompoundedReturns(data: StockDataPoint[]): number[] {
+  const compoundedReturns: number[] = [];
+  let compoundedFactor = 1;
+
+  for (let i = 0; i < data.length; i++) {
+    compoundedFactor = compoundedFactor * (1 + data[i].return);
+    compoundedReturns.push(compoundedFactor - 1);
+  }
+
+  return compoundedReturns;
 }
