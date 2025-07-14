@@ -21,7 +21,6 @@ import {
   formatPercentage,
   getStockColor,
 } from "@/lib/utils";
-import { log } from "console";
 
 ChartJS.register(
   CategoryScale,
@@ -41,11 +40,7 @@ interface StockChartProps {
 
 export function StockChart({ summary }: StockChartProps) {
   const { ticker, data } = summary;
-  console.log("STOCK DAILY RETURNS DATA --------------");
-  console.log(data);
   const compoundedReturns = calculateCompoundedReturns(data);
-  console.log("STOCK COMPOUNDED RETURNS DATA --------------");
-  console.log(compoundedReturns);
   const color = getStockColor(ticker);
 
   const dailyReturnsData = {
