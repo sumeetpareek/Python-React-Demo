@@ -6,6 +6,7 @@ import logging
 
 from data_fetcher import StockDataFetcher
 from data_processor import StockDataProcessor
+from config import config
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +21,7 @@ class DailyReturn(BaseModel):
     class Config:
         # Use the alias for JSON serialization
         populate_by_name = True
-        json_schema_extra = {
+        json_schema_extra = { 
             "example": {
                 "date": "2024-12-03",
                 "return": 0.00051
@@ -29,6 +30,10 @@ class DailyReturn(BaseModel):
 
 class ReturnsResponse(BaseModel):
     data: Dict[str, List[Dict[str, Any]]] = Field(..., description="Returns data for each symbol")
+
+class SymbolsResponse(BaseModel):
+    symbols: List[str] = Field(..., description="List of available stock symbols")
+    description: str = Field(..., description="Description of the symbol set")
 
 class ErrorResponse(BaseModel):
     error: str = Field(..., description="Error message")
@@ -39,28 +44,48 @@ data_fetcher = StockDataFetcher()
 data_processor = StockDataProcessor()
 
 @router.get(
+    "/symbols",
+    response_model=SymbolsResponse,
+    summary="Get available stock symbols",
+    description="Get the list of available stock symbols that can be used in the returns endpoint"
+)
+async def get_symbols() -> SymbolsResponse:
+    """
+    Get the list of available stock symbols.
+    
+    Returns:
+        SymbolsResponse: List of available stock symbols and description
+    """
+    return SymbolsResponse(
+        symbols=config.MAG7_SYMBOLS,
+        description="MAG7 stocks (Microsoft, Apple, Google, Amazon, NVIDIA, Meta, Tesla)"
+    )
+
+@router.get(
     "/returns",
     response_model=ReturnsResponse,
     responses={
         400: {"model": ErrorResponse, "description": "Bad request - invalid parameters"},
         500: {"model": ErrorResponse, "description": "Internal server error"}
     },
-    summary="Get daily returns for MAG7 stocks",
-    description="Fetch daily percentage returns for MAG7 stocks (MSFT, AAPL, GOOGL, AMZN, NVDA, META, TSLA) within a specified date range"
+    summary="Get daily returns for specified stocks",
+    description="Fetch daily percentage returns for specified stocks within a specified date range. If no symbols are provided, returns data for all MAG7 stocks (MSFT, AAPL, GOOGL, AMZN, NVDA, META, TSLA)."
 )
 async def get_returns(
     start: str = Query(..., description="Start date in YYYY-MM-DD format"),
-    end: str = Query(..., description="End date in YYYY-MM-DD format")
+    end: str = Query(..., description="End date in YYYY-MM-DD format"),
+    symbols: Optional[str] = Query(None, description="Comma-separated list of stock symbols (e.g., 'AAPL,MSFT,GOOGL'). If not provided, fetches all MAG7 stocks.")
 ) -> ReturnsResponse:
     """
-    Get daily returns for MAG7 stocks within a specified date range.
+    Get daily returns for specified stocks within a specified date range.
     
     Args:
         start: Start date in YYYY-MM-DD format
         end: End date in YYYY-MM-DD format
+        symbols: Optional comma-separated list of stock symbols
         
     Returns:
-        ReturnsResponse: Daily returns data for each MAG7 stock
+        ReturnsResponse: Daily returns data for each specified stock
         
     Raises:
         HTTPException: If there's an error with the request or data processing
@@ -76,6 +101,19 @@ async def get_returns(
                 detail=f"Invalid date format. Use YYYY-MM-DD format. Error: {str(e)}"
             )
         
+        # Parse symbols if provided
+        symbols_list = None
+        if symbols:
+            try:
+                # Split by comma and clean up whitespace
+                symbols_list = [s.strip().upper() for s in symbols.split(',') if s.strip()]
+                
+                # Validate symbols
+                # TODO: Check how is this being done
+                data_fetcher.validate_symbols(symbols_list)
+            except ValueError as e:
+                raise HTTPException(status_code=400, detail=str(e))
+        
         # Validate date range
         try:
             data_fetcher.validate_date_range(start_date, end_date)
@@ -84,7 +122,7 @@ async def get_returns(
         
         # Fetch price data
         try:
-            price_data = data_fetcher.fetch_daily_prices(start_date, end_date)
+            price_data = data_fetcher.fetch_daily_prices(start_date, end_date, symbols_list)
         except ValueError as e:
             raise HTTPException(status_code=500, detail=f"Failed to fetch stock data: {str(e)}")
         

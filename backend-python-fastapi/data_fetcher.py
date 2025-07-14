@@ -20,20 +20,29 @@ class StockDataFetcher:
     def fetch_daily_prices(
         self, 
         start_date: date, 
-        end_date: date
+        end_date: date,
+        symbols: Optional[List[str]] = None
     ) -> Dict[str, pd.Series]:
         """
-        Fetch daily close prices for MAG7 stocks
+        Fetch daily close prices for specified stocks
         
         Args:
             start_date: Start date for data fetching
             end_date: End date for data fetching
+            symbols: Optional list of stock symbols to fetch. If None, uses all symbols from config
             
         Returns:
             Dictionary mapping symbol to DataFrame with daily close prices
         """
         try:
-            logger.info(f"Fetching data for {len(self.symbols)} symbols from {start_date} to {end_date}")
+            # Use provided symbols or fall back to config symbols
+            symbols_to_fetch = symbols if symbols is not None else self.symbols
+            
+            # Validate symbols
+            if not symbols_to_fetch:
+                raise ValueError("No symbols provided for data fetching")
+            
+            logger.info(f"Fetching data for {len(symbols_to_fetch)} symbols from {start_date} to {end_date}")
             
             # Convert dates to string format for yfinance
             start_str = start_date.strftime('%Y-%m-%d')
@@ -42,7 +51,7 @@ class StockDataFetcher:
             result = {}
             
             # Fetch data for each symbol individually to ensure we get data
-            for symbol in self.symbols:
+            for symbol in symbols_to_fetch:
                 try:
                     logger.info(f"Fetching data for {symbol}")
                     ticker = yf.Ticker(symbol)
@@ -97,4 +106,31 @@ class StockDataFetcher:
         
         # Check if date range is reasonable (not more than configured max days)
         if (end_date - start_date).days > config.MAX_DATE_RANGE_DAYS:
-            raise ValueError(f"Date range cannot exceed {config.MAX_DATE_RANGE_DAYS} days") 
+            raise ValueError(f"Date range cannot exceed {config.MAX_DATE_RANGE_DAYS} days")
+    
+    # TODO: Improve this validation
+    def validate_symbols(self, symbols: List[str]) -> None:
+        """
+        Validate the provided symbols
+        
+        Args:
+            symbols: List of stock symbols to validate
+            
+        Raises:
+            ValueError: If symbols are invalid
+        """
+        if not symbols:
+            raise ValueError("At least one symbol must be provided")
+        
+        # Check for empty or invalid symbols
+        for symbol in symbols:
+            if not symbol or not symbol.strip():
+                raise ValueError("Symbol cannot be empty")
+            
+            # Basic validation - symbols should be alphanumeric
+            if not symbol.strip().isalnum():
+                raise ValueError(f"Invalid symbol format: {symbol}")
+        
+        # Check if we have too many symbols (to prevent abuse)
+        if len(symbols) > 50:  # Reasonable limit
+            raise ValueError("Too many symbols requested. Maximum 50 symbols allowed.") 
