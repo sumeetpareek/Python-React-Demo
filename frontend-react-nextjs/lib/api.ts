@@ -9,14 +9,19 @@ export class ApiError extends Error {
     }
 }
 
-export async function fetchStockReturns(dateRange: DateRange): Promise<ApiResponse> {
+export async function fetchStockReturns(dateRange: DateRange, symbols?: string): Promise<ApiResponse> {
     const { start, end } = dateRange;
 
     // Format dates as YYYY-MM-DD
     const startDate = start.toISOString().split('T')[0];
     const endDate = end.toISOString().split('T')[0];
 
-    const url = `${API_BASE_URL}/returns?start=${startDate}&end=${endDate}`;
+    let url = `${API_BASE_URL}/returns?start=${startDate}&end=${endDate}`;
+
+    // Add symbols parameter if provided
+    if (symbols && symbols.trim()) {
+        url += `&symbols=${encodeURIComponent(symbols.trim())}`;
+    }
 
     try {
         const response = await fetch(url, {

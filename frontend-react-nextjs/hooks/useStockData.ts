@@ -10,7 +10,7 @@ interface UseStockDataReturn {
     summaries: StockSummary[];
     loading: boolean;
     error: string | null;
-    fetchData: (dateRange: DateRange) => Promise<void>;
+    fetchData: (dateRange: DateRange, symbols?: string) => Promise<void>;
 }
 
 export function useStockData(): UseStockDataReturn {
@@ -19,12 +19,12 @@ export function useStockData(): UseStockDataReturn {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchData = useCallback(async (dateRange: DateRange) => {
+    const fetchData = useCallback(async (dateRange: DateRange, symbols?: string) => {
         setLoading(true);
         setError(null);
 
         try {
-            const response = await fetchStockReturns(dateRange);
+            const response = await fetchStockReturns(dateRange, symbols);
             setData(response);
 
             // Calculate summaries for each stock

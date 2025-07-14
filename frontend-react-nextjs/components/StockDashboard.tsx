@@ -4,13 +4,11 @@ import { useState, useEffect } from "react";
 import { subDays } from "date-fns";
 import { DateRange } from "@/lib/types";
 import { useStockData } from "@/hooks/useStockData";
-import { DateRangePicker } from "./DateRangePicker";
+import { DashboardControls } from "./DashboardControls";
 import { StockCard } from "./StockCard";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { ErrorMessage } from "./ErrorMessage";
 import { EmptyState } from "./EmptyState";
-import { Button } from "@/components/ui/button";
-import { RefreshCw } from "lucide-react";
 
 export function StockDashboard() {
   const [dateRange, setDateRange] = useState<DateRange>({
@@ -18,13 +16,17 @@ export function StockDashboard() {
     end: new Date(),
   });
 
+  const [symbols, setSymbols] = useState<string>(
+    "MSFT,AAPL,GOOGL,AMZN,NVDA,META,TSLA"
+  );
+
   const { data, summaries, loading, error, fetchData } = useStockData();
 
   useEffect(() => {
     if (dateRange.start && dateRange.end) {
-      fetchData(dateRange);
+      fetchData(dateRange, symbols);
     }
-  }, [dateRange, fetchData]);
+  }, [dateRange, symbols, fetchData]);
 
   const handleDateRangeChange = (newDateRange: DateRange) => {
     setDateRange(newDateRange);
@@ -32,13 +34,14 @@ export function StockDashboard() {
 
   const handleRetry = () => {
     if (dateRange.start && dateRange.end) {
-      fetchData(dateRange);
+      fetchData(dateRange, symbols);
     }
   };
 
-  const handleRefresh = () => {
+  const handleRefresh = (newSymbols: string) => {
+    setSymbols(newSymbols);
     if (dateRange.start && dateRange.end) {
-      fetchData(dateRange);
+      fetchData(dateRange, newSymbols);
     }
   };
 
@@ -53,25 +56,12 @@ export function StockDashboard() {
         </div>
 
         {/* Controls */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 p-6 bg-white rounded-lg shadow-sm border border-gray-100">
-          <div className="flex flex-col sm:flex-row items-center gap-4">
-            <DateRangePicker
-              dateRange={dateRange}
-              onDateRangeChange={handleDateRangeChange}
-              disabled={loading}
-            />
-          </div>
-
-          <Button
-            onClick={handleRefresh}
-            disabled={loading}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-            Refresh
-          </Button>
-        </div>
+        <DashboardControls
+          dateRange={dateRange}
+          onDateRangeChange={handleDateRangeChange}
+          onRefresh={handleRefresh}
+          loading={loading}
+        />
 
         {/* Content */}
         <div className="space-y-6">
